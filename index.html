@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MenuAR · Auth + QR System</title>
+    <title>MenuAR · Full Navigation + Auth + QR System</title>
     <!-- Font Awesome 6 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <!-- QR Code library (generates QR codes on the fly) -->
+    <!-- QR Code library -->
     <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
     <style>
         * {
@@ -26,7 +26,7 @@
             transition: background 0.2s;
         }
 
-        /* app container (visible after login) */
+        /* app container */
         .portal {
             max-width: 1440px;
             width: 100%;
@@ -34,7 +34,7 @@
             border-radius: 48px 48px 32px 32px;
             box-shadow: 0 30px 60px -20px #0b1a3360;
             overflow: hidden;
-            display: none; /* hidden until login */
+            display: none;
             flex-direction: column;
         }
 
@@ -42,7 +42,7 @@
             display: flex;
         }
 
-        /* auth pages (shown by default) */
+        /* auth styles */
         .auth-container {
             background: white;
             border-radius: 40px;
@@ -51,7 +51,6 @@
             max-width: 480px;
             padding: 2.5rem;
             margin: 0 auto;
-            transition: 0.2s;
         }
 
         .auth-header {
@@ -67,9 +66,6 @@
             font-weight: 700;
             font-size: 1.8rem;
         }
-        .auth-header p {
-            color: #4a5f7c;
-        }
 
         .input-group {
             margin-bottom: 1.5rem;
@@ -82,7 +78,6 @@
             transform: translateY(-50%);
             color: #2563eb;
             font-size: 1.2rem;
-            width: 24px;
         }
         .input-group input {
             width: 100%;
@@ -91,12 +86,10 @@
             border-radius: 40px;
             font-size: 1rem;
             outline: none;
-            transition: 0.2s;
             background: #f9fcff;
         }
         .input-group input:focus {
             border-color: #2563eb;
-            background: white;
         }
 
         .auth-btn {
@@ -110,11 +103,9 @@
             font-size: 1.2rem;
             cursor: pointer;
             transition: 0.2s;
-            box-shadow: 0 10px 20px -7px #1e3f8f;
         }
         .auth-btn:hover {
             background: #1a4fc4;
-            transform: scale(1.01);
         }
 
         .auth-footer {
@@ -136,7 +127,7 @@
             padding-left: 1rem;
         }
 
-        /* ========== PORTAL STYLES (same as before with QR additions) ========= */
+        /* ========== PORTAL STYLES ========= */
         .top-header {
             display: flex;
             justify-content: space-between;
@@ -154,7 +145,6 @@
             background: white;
             padding: 0.4rem 1.2rem;
             border-radius: 40px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
             border: 1px solid #e9edf4;
         }
 
@@ -165,7 +155,6 @@
             background: white;
             padding: 0.3rem 1.5rem 0.3rem 1rem;
             border-radius: 60px;
-            box-shadow: 0 6px 12px rgba(0,40,80,0.1);
             border: 1px solid #cddcf2;
         }
         .menuar-logo-png img {
@@ -178,7 +167,6 @@
             background: #e9f0ff;
             padding: 0.3rem 1rem;
             border-radius: 30px;
-            font-size: 0.9rem;
         }
 
         .dashboard-row {
@@ -188,66 +176,91 @@
             padding: 0 2rem;
         }
 
+        /* SIDEBAR NAVIGATION (clickable) */
         .side-nav {
             background: #0b1a33;
             border-radius: 28px;
             padding: 2rem 1.5rem;
-            width: 260px;
+            width: 280px;
             box-shadow: 0 20px 30px -10px rgba(0,20,50,0.4);
             align-self: start;
+            transition: all 0.2s;
         }
 
-        .side-nav .nav-item {
+        .nav-item {
             display: flex;
             align-items: center;
             gap: 14px;
             color: #b0c7e9;
             font-weight: 500;
-            padding: 0.8rem 1rem;
-            margin: 0.2rem 0;
+            padding: 0.85rem 1rem;
+            margin: 0.25rem 0;
             border-radius: 16px;
             transition: 0.2s;
-            cursor: default;
+            cursor: pointer;
         }
 
-        .side-nav .nav-item i {
-            width: 24px;
+        .nav-item i {
+            width: 26px;
             font-size: 1.2rem;
             color: #3e71b5;
         }
 
-        .side-nav .nav-item.active {
+        .nav-item.active {
             background: #2563eb;
             color: white;
             box-shadow: 0 8px 14px -6px #1e4bb3;
         }
-        .side-nav .nav-item.active i {
+        .nav-item.active i {
             color: white;
         }
 
+        .nav-item:not(.active):hover {
+            background: #122c4a;
+            color: #d9e6ff;
+        }
+
+        .side-nav hr {
+            border: 0.5px solid #254569;
+            margin: 1.8rem 0 1.2rem;
+        }
+
+        /* main content panels */
         .main-content {
             flex: 1;
             min-width: 300px;
         }
 
+        .panel {
+            display: none;
+            animation: fadeIn 0.25s ease;
+        }
+        .panel.active-panel {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px);}
+            to { opacity: 1; transform: translateY(0);}
+        }
+
+        /* reusable cards */
         .stat-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 1.2rem;
             margin-bottom: 2rem;
         }
-
         .stat-card {
             background: white;
             border-radius: 24px;
             padding: 1.3rem 1.2rem;
-            box-shadow: 0 6px 14px rgba(0, 20, 40, 0.04);
             border: 1px solid #eef3fa;
         }
         .stat-card .label { color: #4b5b73; font-size: 0.85rem; }
         .stat-card .value { font-size: 2rem; font-weight: 700; color: #0b1a33; }
 
-        .wizard-card {
+        .wizard-card, .restaurant-list-card, .subscription-card, .reports-card, .support-card, .qr-section-card {
             background: white;
             border-radius: 28px;
             padding: 1.8rem 2rem;
@@ -255,446 +268,402 @@
             border: 1px solid #e2ebf6;
         }
 
-        .step-indicator {
+        .restaurant-item {
             display: flex;
-            gap: 2rem;
-            flex-wrap: wrap;
+            justify-content: space-between;
             align-items: center;
-            margin-bottom: 2rem;
+            padding: 1rem 0;
+            border-bottom: 1px solid #eef3fc;
         }
-        .step { display: flex; align-items: center; gap: 8px; color: #6a7f9f; }
-        .step.complete { color: #0b1a33; }
-        .step.complete .step-badge { background: #2563eb; color: white; }
-        .step.active .step-badge { border: 2px solid #2563eb; background: white; color: #1e3a8a; }
-        .step-badge { width: 34px; height: 34px; border-radius: 40px; background: #f1f6fd; display: flex; align-items: center; justify-content: center; font-weight: 600; }
+        .restaurant-info { display: flex; align-items: center; gap: 12px; }
+        .restaurant-info img { width: 40px; height: 40px; border-radius: 12px; }
 
-        .info-panel {
+        .plan-badge {
+            background: #eef4ff;
+            padding: 0.3rem 1rem;
+            border-radius: 40px;
+            font-weight: 600;
+            color: #1e3a8a;
+        }
+
+        .qr-system-inline {
             display: flex;
             flex-wrap: wrap;
             gap: 2rem;
-            margin-top: 1.5rem;
-        }
-        .restaurant-details { flex: 2; min-width: 280px; }
-        .detail-row { display: flex; flex-wrap: wrap; gap: 1.8rem 2.5rem; margin-bottom: 1.8rem; }
-        .detail-item .tag { color: #64748b; font-size: 0.8rem; text-transform: uppercase; }
-        .detail-item .field { font-weight: 600; font-size: 1.2rem; color: #0b1a33; border-bottom: 2px dotted #b7d0f0; padding-bottom: 4px; }
-        .logo-preview { display: flex; align-items: center; gap: 12px; background: #f4f9ff; padding: 0.4rem 1.2rem; border-radius: 40px; border: 2px dashed #2563eb; }
-        .logo-preview img { width: 36px; height: 36px; border-radius: 12px; object-fit: cover; }
-
-        .recent-box {
-            flex: 1; background: #f8fbfe; border-radius: 22px; padding: 1.6rem 1.3rem;
-            border: 1px solid #dae5f5;
-        }
-        .recent-item { display: flex; justify-content: space-between; align-items: center; padding: 0.7rem 0; border-bottom: 1px solid #e2eaf5; }
-        .restaurant-icon-with-image { display: flex; align-items: center; gap: 10px; }
-        .restaurant-icon-with-image img { width: 28px; height: 28px; border-radius: 10px; }
-
-        /* ----- QR SYSTEM SECTION (interactive) ----- */
-        .qr-system-section {
-            background: white;
-            border-radius: 28px;
-            padding: 1.8rem 2rem;
-            margin-bottom: 2rem;
-            border: 2px solid #2563eb30;
-            box-shadow: 0 15px 30px -18px #0b1a33;
-            display: flex;
-            flex-wrap: wrap;
             align-items: center;
-            gap: 2rem;
         }
-        .qr-generator {
+        .qr-gen-panel {
             flex: 2;
-            min-width: 280px;
         }
-        .qr-generator h3 {
-            color: #0b1a33;
-            font-size: 1.6rem;
-            font-weight: 700;
-            margin-bottom: 1rem;
-        }
-        .qr-generator p {
-            color: #2e4a77;
-            margin-bottom: 1.5rem;
+        .qr-display-card {
+            flex: 1;
+            background: #f8fbfe;
+            border-radius: 28px;
+            padding: 1.5rem;
+            text-align: center;
         }
         .qr-input-row {
             display: flex;
             flex-wrap: wrap;
             gap: 10px;
-            margin-bottom: 1.5rem;
+            margin: 1rem 0;
         }
         .qr-input-row input {
             flex: 1;
-            padding: 1rem 1.2rem;
-            border: 2px solid #dde5f0;
-            border-radius: 60px;
-            font-size: 1rem;
-            outline: none;
-        }
-        .qr-input-row input:focus {
-            border-color: #2563eb;
+            padding: 0.8rem 1rem;
+            border: 2px solid #e2eaf5;
+            border-radius: 40px;
         }
         .qr-input-row button {
             background: #0b1a33;
             color: white;
             border: none;
-            border-radius: 60px;
-            padding: 0 2rem;
-            font-weight: 600;
-            font-size: 1rem;
+            padding: 0 1.5rem;
+            border-radius: 40px;
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: 0.2s;
-            border: 2px solid #0b1a33;
+            font-weight: 600;
         }
-        .qr-input-row button:hover {
-            background: #1f3d6b;
-        }
-        .qr-display {
-            flex: 1;
-            background: #f4f9ff;
-            border-radius: 38px;
-            padding: 2rem 1.5rem;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            border: 1px dashed #2563eb;
-        }
-        .qr-display canvas, .qr-display img {
-            max-width: 160px;
-            max-height: 160px;
-            border: 4px solid white;
-            box-shadow: 0 12px 24px -16px #102b4e;
-            border-radius: 24px;
-            margin-bottom: 0.8rem;
+        .qr-display-card canvas {
+            max-width: 140px;
+            margin: 0.5rem auto;
+            border-radius: 20px;
             background: white;
         }
-        .qr-display .qr-pay-badge {
-            background: #2563eb;
-            color: white;
-            padding: 0.3rem 1.2rem;
-            border-radius: 60px;
-            font-weight: 600;
+
+        .support-options {
+            display: flex;
+            gap: 1.5rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+        .support-card-item {
+            background: #f8fbfe;
+            padding: 1.5rem;
+            border-radius: 24px;
+            text-align: center;
+            flex: 1;
         }
 
-        .ar-menu-ready { margin-top: 1rem; }
-        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.2rem; }
-        .all-folders { background: white; border-radius: 26px; padding: 0.2rem 0.2rem 0.2rem 1.8rem; border: 1px solid #dbe6f2; color: #1f3a6b; font-weight: 600; line-height: 42px; }
-        .all-folders i { background: #2563eb; color: white; padding: 10px 16px; border-radius: 40px; margin-left: 12px; }
-
-        .restaurants-table {
-            background: white; border-radius: 28px; padding: 1.2rem 1.8rem; border: 1px solid #e3ebf7;
-            overflow-x: auto;
+        .footer-note {
+            text-align: center;
+            padding: 2rem;
+            color: #5b759b;
         }
-        table { width: 100%; border-collapse: collapse; }
-        th { text-align: left; padding: 1.2rem 0.5rem 0.8rem; color: #4a607c; font-weight: 600; border-bottom: 2px solid #eef3fc; }
-        td { padding: 1rem 0.5rem; border-bottom: 1px solid #edf2f9; color: #182f4f; }
-        .restaurant-cell { display: flex; align-items: center; gap: 10px; }
-        .restaurant-cell img { width: 34px; height: 34px; border-radius: 12px; }
-
-        .status-badge { background: #e2f0e6; color: #1d7643; padding: 0.25rem 0.8rem; border-radius: 40px; font-size: 0.8rem; }
-        .status-badge.ready { background: #2563eb10; color: #1e4bb3; border: 1px solid #aac2f0; }
-        .actions i { color: #7e92af; margin: 0 8px; cursor: default; }
-        .footer-note { text-align: center; padding: 2rem; color: #5b759b; }
-
         .logout-btn {
             background: transparent;
             border: 2px solid #cddcf2;
             border-radius: 40px;
             padding: 0.5rem 1.5rem;
             font-weight: 600;
-            color: #1f4172;
             cursor: pointer;
-            transition: 0.2s;
         }
-        .logout-btn:hover { background: #e0ebff; }
     </style>
 </head>
 <body>
 
-<!-- AUTHENTICATION PAGE (Login / Signup) -->
+<!-- AUTHENTICATION PAGE -->
 <div id="authContainer" class="auth-container">
     <div class="auth-header">
         <img src="https://placehold.co/120x40/0b1a33/white?text=MenuAR+Logo&font=montserrat" alt="MenuAR">
         <h2 id="authTitle">Login to MenuAR</h2>
-        <p id="authSubtitle">Access your restaurant onboarding portal</p>
+        <p id="authSubtitle">Access restaurant onboarding portal</p>
     </div>
-
-    <!-- Login form (visible by default) -->
     <div id="loginForm">
-        <div class="input-group">
-            <i class="fas fa-envelope"></i>
-            <input type="email" id="loginEmail" placeholder="Email address" value="demo@menuar.com">
-        </div>
-        <div class="input-group">
-            <i class="fas fa-lock"></i>
-            <input type="password" id="loginPassword" placeholder="Password" value="demo123">
-        </div>
+        <div class="input-group"><i class="fas fa-envelope"></i><input type="email" id="loginEmail" placeholder="Email" value="demo@menuar.com"></div>
+        <div class="input-group"><i class="fas fa-lock"></i><input type="password" id="loginPassword" placeholder="Password" value="demo123"></div>
         <div id="loginError" class="error-msg"></div>
         <button class="auth-btn" id="loginBtn"><i class="fas fa-sign-in-alt"></i> Login</button>
     </div>
-
-    <!-- Signup form (hidden initially) -->
     <div id="signupForm" style="display: none;">
-        <div class="input-group">
-            <i class="fas fa-user"></i>
-            <input type="text" id="signupName" placeholder="Full name" value="Restaurant Owner">
-        </div>
-        <div class="input-group">
-            <i class="fas fa-envelope"></i>
-            <input type="email" id="signupEmail" placeholder="Email" value="owner@restaurant.com">
-        </div>
-        <div class="input-group">
-            <i class="fas fa-lock"></i>
-            <input type="password" id="signupPassword" placeholder="Password" value="owner123">
-        </div>
-        <div class="input-group">
-            <i class="fas fa-store"></i>
-            <input type="text" id="signupRestaurant" placeholder="Restaurant name" value="The Rustic Table">
-        </div>
+        <div class="input-group"><i class="fas fa-user"></i><input type="text" id="signupName" placeholder="Full name"></div>
+        <div class="input-group"><i class="fas fa-envelope"></i><input type="email" id="signupEmail" placeholder="Email"></div>
+        <div class="input-group"><i class="fas fa-lock"></i><input type="password" id="signupPassword" placeholder="Password"></div>
+        <div class="input-group"><i class="fas fa-store"></i><input type="text" id="signupRestaurant" placeholder="Restaurant name"></div>
         <div id="signupError" class="error-msg"></div>
         <button class="auth-btn" id="signupBtn"><i class="fas fa-user-plus"></i> Sign Up</button>
     </div>
-
-    <div class="auth-footer">
-        <span id="toggleAuthText">Don't have an account? <span id="toggleLink">Sign up</span></span>
-        <br><small>demo: any email/password works</small>
-    </div>
+    <div class="auth-footer"><span id="toggleLink">Sign up</span> <br><small>demo: any email/password works</small></div>
 </div>
 
-<!-- MAIN PORTAL (visible after login) -->
+<!-- MAIN PORTAL -->
 <div id="portal" class="portal">
-    <!-- same header -->
     <div class="top-header">
-        <div class="multi-text"><i class="fas fa-utensils"></i> Multi-restaurant management</div>
+        <div class="multi-text"><i class="fas fa-utensils"></i> Multi-restaurant management · AR Menu</div>
         <div style="display: flex; gap: 1rem; align-items: center;">
-            <div class="menuar-logo-png">
-                <img src="https://placehold.co/120x40/0b1a33/white?text=MenuAR+Logo&font=montserrat" alt="MenuAR">
-                <span>Onboarding</span>
-            </div>
+            <div class="menuar-logo-png"><img src="https://placehold.co/120x40/0b1a33/white?text=MenuAR+Logo" alt="logo"><span>Onboarding</span></div>
             <button class="logout-btn" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
         </div>
     </div>
 
     <div class="dashboard-row">
-        <div class="side-nav">
-            <div class="nav-item active"><i class="fas fa-th-large"></i> Dashboard</div>
-            <div class="nav-item"><i class="fas fa-store"></i> Restaurant List</div>
-            <div class="nav-item"><i class="fas fa-plus-circle"></i> Restaurant Onboarding</div>
-            <div class="nav-item"><i class="fas fa-cubes"></i> Asset Management</div>
-            <div class="nav-item"><i class="fas fa-credit-card"></i> Subscriptions</div>
-            <div class="nav-item"><i class="fas fa-qrcode"></i> QR System</div> <!-- active qr menu -->
-            <div class="nav-item"><i class="fas fa-headset"></i> Support</div>
+        <!-- SIDEBAR CLICKABLE NAVIGATION -->
+        <div class="side-nav" id="sidebarNav">
+            <div class="nav-item" data-panel="dashboard"><i class="fas fa-th-large"></i> Dashboard</div>
+            <div class="nav-item" data-panel="restaurants"><i class="fas fa-store"></i> Restaurant List</div>
+            <div class="nav-item" data-panel="onboarding"><i class="fas fa-plus-circle"></i> Restaurant Onboarding</div>
+            <div class="nav-item" data-panel="assets"><i class="fas fa-cubes"></i> Asset Management</div>
+            <div class="nav-item" data-panel="subscriptions"><i class="fas fa-credit-card"></i> Subscriptions</div>
+            <div class="nav-item" data-panel="qr"><i class="fas fa-qrcode"></i> QR System</div>
+            <div class="nav-item" data-panel="reports"><i class="fas fa-chart-bar"></i> Reports</div>
+            <div class="nav-item" data-panel="support"><i class="fas fa-headset"></i> Support</div>
             <hr>
         </div>
 
         <div class="main-content">
-            <!-- stats -->
-            <div class="stat-grid">
-                <div class="stat-card"><div class="label">Total Restaurants</div><div class="value">42</div></div>
-                <div class="stat-card"><div class="label">Onboarding In Progress</div><div class="value">5</div></div>
-                <div class="stat-card"><div class="label">Active Menus</div><div class="value">37</div></div>
-                <div class="stat-card"><div class="label">Subscription Revenue</div><div class="value">$12.5k</div></div>
+            <!-- PANEL 1: DASHBOARD -->
+            <div id="panel-dashboard" class="panel active-panel">
+                <div class="stat-grid">
+                    <div class="stat-card"><div class="label">Total Restaurants</div><div class="value">42</div></div>
+                    <div class="stat-card"><div class="label">Onboarding In Progress</div><div class="value">5</div></div>
+                    <div class="stat-card"><div class="label">Active Menus</div><div class="value">37</div></div>
+                    <div class="stat-card"><div class="label">Subscription Revenue</div><div class="value">$12.5k</div></div>
+                </div>
+                <div class="wizard-card">
+                    <h3 style="margin-bottom: 1rem;">📊 Recent Activity</h3>
+                    <p>New restaurant "The Burger Lab" started onboarding • 2 AR menus published today</p>
+                    <div style="margin-top: 1rem; background:#eef4ff; border-radius: 24px; padding: 1rem;">⭐ Top performing: The Steakhouse (AR views +340%)</div>
+                </div>
             </div>
 
-            <!-- Onboarding card -->
-            <div class="wizard-card">
-                <div class="step-indicator">
-                    <div class="step complete"><span class="step-badge"><i class="fas fa-check"></i></span> Account Setup</div>
-                    <div class="step complete"><span class="step-badge"><i class="fas fa-check"></i></span> General Info</div>
-                    <div class="step active"><span class="step-badge">3</span> Menu Digitization</div>
-                    <div class="step"><span class="step-badge">4</span> AR Content Upload</div>
-                    <div class="step"><span class="step-badge">5</span> Review & Publish</div>
+            <!-- PANEL 2: RESTAURANT LIST -->
+            <div id="panel-restaurants" class="panel">
+                <div class="restaurant-list-card">
+                    <h3><i class="fas fa-store"></i> All Restaurants</h3>
+                    <div class="restaurant-item"><div class="restaurant-info"><img src="https://placehold.co/40x40/e11d48/white?text=🥩"><span><b>The Steakhouse</b><br>Downtown</span></div><span class="plan-badge">Active</span></div>
+                    <div class="restaurant-item"><div class="restaurant-info"><img src="https://placehold.co/40x40/0d9488/white?text=🍣"><span><b>Sushi Palace</b><br>Midtown</span></div><span class="plan-badge">Pending</span></div>
+                    <div class="restaurant-item"><div class="restaurant-info"><img src="https://placehold.co/40x40/c2410c/white?text=🍕"><span><b>La Trattoria</b><br>Brooklyn</span></div><span class="plan-badge">Active</span></div>
+                    <div class="restaurant-item"><div class="restaurant-info"><img src="https://placehold.co/40x40/bd6b2b/white?text=🍔"><span><b>Burger Joint</b><br>Queens</span></div><span class="plan-badge">Active</span></div>
                 </div>
-                <div class="info-panel">
-                    <div class="restaurant-details">
-                        <div class="detail-row"><div class="detail-item"><span class="tag">Restaurant Name</span><div class="field">The Rustic Table</div></div><div class="detail-item"><span class="tag">Address</span><div class="field">123 Main St, NY</div></div></div>
-                        <div class="detail-row"><div class="detail-item"><span class="tag">Contact</span><div class="field">Jamie Lee</div></div><div class="detail-item"><span class="tag">Phone</span><div class="field">+1 (212) 555 7643</div></div></div>
-                        <div class="detail-row"><div class="detail-item"><span class="tag">Cuisine</span><div class="field dropdown-badge">Italian / Fusion</div></div>
-                            <div class="detail-item"><span class="tag">Upload Logo</span><div class="logo-preview"><img src="https://placehold.co/60x60/2563eb/white?text=🍽️" alt="logo"><span>logo_rustic.png</span></div></div>
+            </div>
+
+            <!-- PANEL 3: RESTAURANT ONBOARDING (wizard) -->
+            <div id="panel-onboarding" class="panel">
+                <div class="wizard-card">
+                    <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 1.5rem;">
+                        <span style="background:#2563eb; color:white; padding:0.3rem 1rem; border-radius:40px;">Step 1 ✓</span>
+                        <span style="background:#2563eb; color:white; padding:0.3rem 1rem; border-radius:40px;">Step 2 ✓</span>
+                        <span style="background:#eef4ff; padding:0.3rem 1rem; border-radius:40px;">Step 3: Menu</span>
+                        <span>Step 4: AR Content</span>
+                    </div>
+                    <div class="info-panel" style="display: flex; gap: 2rem; flex-wrap: wrap;">
+                        <div><span class="tag">Restaurant</span><div class="field">The Rustic Table</div></div>
+                        <div><span class="tag">Address</span><div class="field">123 Main St, NY</div></div>
+                        <div><span class="tag">Cuisine</span><div class="field dropdown-badge">Italian / Fusion</div></div>
+                    </div>
+                    <button style="margin-top: 1rem; background:#2563eb; border:none; padding:0.8rem 2rem; border-radius:40px; color:white;"><i class="fas fa-upload"></i> Upload Menu (PDF/Image)</button>
+                </div>
+            </div>
+
+            <!-- PANEL 4: ASSET MANAGEMENT -->
+            <div id="panel-assets" class="panel">
+                <div class="restaurant-list-card">
+                    <h3><i class="fas fa-cubes"></i> AR Assets & Media</h3>
+                    <div class="restaurant-item"><span>🍔 Burger 3D model</span><span class="plan-badge">Ready</span></div>
+                    <div class="restaurant-item"><span>🍣 Sushi AR preview</span><span class="plan-badge">Processing</span></div>
+                    <div class="restaurant-item"><span>🎨 The Steakhouse branding kit</span><span class="plan-badge">Published</span></div>
+                </div>
+            </div>
+
+            <!-- PANEL 5: SUBSCRIPTIONS -->
+            <div id="panel-subscriptions" class="panel">
+                <div class="subscription-card">
+                    <h3>Subscription Plans</h3>
+                    <div style="display: flex; gap: 1.5rem; flex-wrap: wrap; margin-top: 1.5rem;">
+                        <div style="flex:1; background:#f4f9ff; border-radius: 24px; padding: 1.2rem;"><b>Trial</b><br>7 days free<br><span class="plan-badge">Limited features</span></div>
+                        <div style="flex:1; background:#eef4ff; border-radius: 24px; padding: 1.2rem;"><b>Starter</b><br>$29/mo<br>50 items, branding</div>
+                        <div style="flex:1; background:#2563eb10; border-radius: 24px; padding: 1.2rem;"><b>Premium</b><br>$79/mo<br>Unlimited + analytics</div>
+                    </div>
+                    <div class="restaurant-item" style="margin-top: 2rem;"><span>Current plan: Premium (active until Dec 2025)</span><span class="plan-badge">Manage</span></div>
+                </div>
+            </div>
+
+            <!-- PANEL 6: QR SYSTEM (interactive) -->
+            <div id="panel-qr" class="panel">
+                <div class="qr-section-card">
+                    <h3><i class="fas fa-qrcode"></i> QR Code System · Scan to pay & menu</h3>
+                    <div class="qr-system-inline">
+                        <div class="qr-gen-panel">
+                            <div class="qr-input-row">
+                                <input type="text" id="qrTableInput" placeholder="Table number (e.g. T5)" value="T12">
+                                <button id="genTableQr"><i class="fas fa-qrcode"></i> Generate Table QR</button>
+                            </div>
+                            <div class="qr-input-row">
+                                <input type="text" id="qrAmountInput" placeholder="Amount (USD)" value="24.99">
+                                <button id="genPayQr" style="background:#2563eb;"><i class="fas fa-dollar-sign"></i> Payment QR</button>
+                            </div>
+                            <p><i class="fas fa-info-circle"></i> QR links to digital menu or instant payment.</p>
+                        </div>
+                        <div class="qr-display-card" id="qrDisplayBlock">
+                            <canvas id="qrCanvasDynamic"></canvas>
+                            <div class="plan-badge" id="qrLabelDynamic">SCAN TO ORDER</div>
+                            <p id="qrLinkDynamic" style="font-size: 0.7rem; word-break:break-all;">menuar.com/table/T12</p>
                         </div>
                     </div>
-                    <div class="recent-box">
-                        <h4><i class="fas fa-clock"></i> Recent Restaurants</h4>
-                        <div class="recent-item"><div class="restaurant-icon-with-image"><img src="https://placehold.co/40x40/e11d48/white?text=🥩"><span>The Steakhouse</span></div><span class="status active">Active</span></div>
-                        <div class="recent-item"><div class="restaurant-icon-with-image"><img src="https://placehold.co/40x40/0d9488/white?text=🍣"><span>Sushi Palace</span></div><span class="status pending">Pending</span></div>
+                </div>
+            </div>
+
+            <!-- PANEL 7: REPORTS -->
+            <div id="panel-reports" class="panel">
+                <div class="reports-card">
+                    <h3>📈 Analytics & Reports</h3>
+                    <div class="restaurant-item"><span>Most viewed items: Steak, Sushi Roll, Margherita</span><span>+124% this week</span></div>
+                    <div class="restaurant-item"><span>Total AR scans (MTD)</span><span>3,240</span></div>
+                    <div class="restaurant-item"><span>Avg. order value (AR menu)</span><span>$42.80</span></div>
+                </div>
+            </div>
+
+            <!-- PANEL 8: SUPPORT -->
+            <div id="panel-support" class="panel">
+                <div class="support-card">
+                    <h3>Support Center</h3>
+                    <div class="support-options">
+                        <div class="support-card-item"><i class="fas fa-headset fa-2x"></i><br>24/7 Live Chat<br><span class="plan-badge">Available</span></div>
+                        <div class="support-card-item"><i class="fas fa-envelope fa-2x"></i><br>support@menuar.com<br><span class="plan-badge">Email us</span></div>
+                        <div class="support-card-item"><i class="fas fa-book fa-2x"></i><br>Documentation<br><span class="plan-badge">Guides</span></div>
                     </div>
                 </div>
             </div>
 
-            <!-- ========== QR SYSTEM SECTION (interactive) ========= -->
-            <div class="qr-system-section">
-                <div class="qr-generator">
-                    <h3><i class="fas fa-qrcode" style="color:#2563eb;"></i> QR Code System · Scan to pay</h3>
-                    <p>Generate table QR for instant mobile payment & menu access.</p>
-                    <div class="qr-input-row">
-                        <input type="text" id="qrInput" placeholder="Table number / ID (e.g. T12)" value="T12">
-                        <button id="generateQrBtn"><i class="fas fa-sync-alt"></i> Generate</button>
-                    </div>
-                    <div class="qr-input-row" style="margin-top:5px;">
-                        <input type="text" id="customAmount" placeholder="Amount (optional) e.g. 45.90" value="0.00">
-                        <button id="generatePayQrBtn" style="background:#2563eb;"><i class="fas fa-dollar-sign"></i> Payment QR</button>
-                    </div>
-                    <p style="font-size:0.9rem; color:#2e5799;"><i class="fas fa-info-circle"></i> Scan QR to open payment or menu link.</p>
-                </div>
-                <div class="qr-display" id="qrDisplayBox">
-                    <canvas id="qrCanvas"></canvas>
-                    <div class="qr-pay-badge" id="qrBadge">SCAN TO PAY</div>
-                    <p id="qrLinkText" style="font-size:0.8rem; word-break:break-all;">menuar.com/table/T12</p>
-                </div>
-            </div>
-
-            <!-- AR Menu table -->
-            <div class="ar-menu-ready">
-                <div class="section-header"><h3>AR Menu Ready</h3><div class="all-folders"><i class="fas fa-folder-open"></i> All Folders</div></div>
-                <div class="restaurants-table">
-                    <table>
-                        <thead><tr><th>Restaurant</th><th>Location</th><th>Status</th><th>AR Ready</th><th>Last Activity</th><th>Actions</th></tr></thead>
-                        <tbody>
-                            <tr><td><div class="restaurant-cell"><img src="https://placehold.co/40x40/1e3a8a/white?text=🥩"> The Steakhouse</div></td><td>Downtown</td><td><span class="status-badge">Pending</span></td><td><span class="status-badge ready">Ready</span></td><td>Jun 03, 05:38 AM</td><td class="actions"><i class="far fa-edit"></i></td></tr>
-                            <tr><td><div class="restaurant-cell"><img src="https://placehold.co/40x40/0d9488/white?text=🍣"> Sushi Palace</div></td><td>Midtown</td><td><span class="status-badge">Pending</span></td><td><span class="status-badge ready">Ready</span></td><td>Jun 03, 03:38 AM</td><td class="actions"><i class="far fa-edit"></i></td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            <div class="footer-note"><i class="fas fa-cube"></i> MenuAR · Auth + QR system live</div>
+            <div class="footer-note"><i class="fas fa-cube"></i> MenuAR · Clickable sidebar navigation</div>
         </div>
     </div>
 </div>
 
 <script>
-    (function() {
-        // --- Auth state ---
-        let isLoggedIn = false;   // will be set after login
+    // AUTHENTICATION LOGIC
+    const authContainer = document.getElementById('authContainer');
+    const portalDiv = document.getElementById('portal');
+    const loginFormDiv = document.getElementById('loginForm');
+    const signupFormDiv = document.getElementById('signupForm');
+    const toggleLink = document.getElementById('toggleLink');
+    const loginErrorSpan = document.getElementById('loginError');
+    const signupErrorSpan = document.getElementById('signupError');
+    let showingLogin = true;
 
-        const authContainer = document.getElementById('authContainer');
-        const portal = document.getElementById('portal');
-        const loginFormDiv = document.getElementById('loginForm');
-        const signupFormDiv = document.getElementById('signupForm');
-        const authTitle = document.getElementById('authTitle');
-        const authSubtitle = document.getElementById('authSubtitle');
-        const toggleLink = document.getElementById('toggleLink');
-        const loginError = document.getElementById('loginError');
-        const signupError = document.getElementById('signupError');
-
-        // Toggle between login and signup
-        let showingLogin = true;
-        toggleLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            showingLogin = !showingLogin;
-            if (showingLogin) {
-                loginFormDiv.style.display = 'block';
-                signupFormDiv.style.display = 'none';
-                authTitle.innerText = 'Login to MenuAR';
-                authSubtitle.innerText = 'Access your restaurant onboarding portal';
-                toggleLink.innerText = 'Sign up';
-                loginError.innerText = '';
-            } else {
-                loginFormDiv.style.display = 'none';
-                signupFormDiv.style.display = 'block';
-                authTitle.innerText = 'Create account';
-                authSubtitle.innerText = 'Start your 7-day trial';
-                toggleLink.innerText = 'Login';
-                signupError.innerText = '';
-            }
-        });
-
-        // Simple mock authentication (any non-empty credentials work)
-        function doLogin(email, password) {
-            if (email.trim() !== '' && password.trim() !== '') {
-                return true;
-            }
-            return false;
-        }
-
-        document.getElementById('loginBtn').addEventListener('click', () => {
-            const email = document.getElementById('loginEmail').value;
-            const pwd = document.getElementById('loginPassword').value;
-            if (doLogin(email, pwd)) {
-                isLoggedIn = true;
-                authContainer.style.display = 'none';
-                portal.classList.add('show');
-                loginError.innerText = '';
-            } else {
-                loginError.innerText = 'Invalid credentials (use any non-empty)';
-            }
-        });
-
-        document.getElementById('signupBtn').addEventListener('click', () => {
-            const name = document.getElementById('signupName').value;
-            const email = document.getElementById('signupEmail').value;
-            const pwd = document.getElementById('signupPassword').value;
-            const rest = document.getElementById('signupRestaurant').value;
-            if (name && email && pwd && rest) {
-                isLoggedIn = true;
-                authContainer.style.display = 'none';
-                portal.classList.add('show');
-                signupError.innerText = '';
-            } else {
-                signupError.innerText = 'Please fill all fields';
-            }
-        });
-
-        // logout
-        document.getElementById('logoutBtn').addEventListener('click', () => {
-            isLoggedIn = false;
-            portal.classList.remove('show');
-            authContainer.style.display = 'block';
-            // reset to login view
-            showingLogin = true;
+    toggleLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        showingLogin = !showingLogin;
+        if (showingLogin) {
             loginFormDiv.style.display = 'block';
             signupFormDiv.style.display = 'none';
-            authTitle.innerText = 'Login to MenuAR';
+            document.getElementById('authTitle').innerText = 'Login to MenuAR';
             toggleLink.innerText = 'Sign up';
-        });
-
-        // --- QR Code System (interactive) ---
-        const qrCanvas = document.getElementById('qrCanvas');
-        const qrInput = document.getElementById('qrInput');
-        const generateBtn = document.getElementById('generateQrBtn');
-        const generatePayBtn = document.getElementById('generatePayQrBtn');
-        const qrBadge = document.getElementById('qrBadge');
-        const qrLinkText = document.getElementById('qrLinkText');
-        const customAmount = document.getElementById('customAmount');
-
-        function generateQR(text, label = 'SCAN TO PAY') {
-            if (!text) text = 'menuar.com/table/default';
-            QRCode.toCanvas(qrCanvas, text, { width: 160, margin: 1, color: { dark: '#0b1a33', light: '#ffffff' } }, (err) => {
-                if (err) console.error(err);
-            });
-            qrBadge.innerText = label;
-            qrLinkText.innerText = text;
+        } else {
+            loginFormDiv.style.display = 'none';
+            signupFormDiv.style.display = 'block';
+            document.getElementById('authTitle').innerText = 'Create account';
+            toggleLink.innerText = 'Login';
         }
+    });
 
-        // default QR
-        generateQR('https://menuar.com/table/T12', 'SCAN TO PAY');
-
-        generateBtn.addEventListener('click', () => {
-            let tableId = qrInput.value.trim() || 'T12';
-            let link = `https://menuar.com/order/${encodeURIComponent(tableId)}`;
-            generateQR(link, `TABLE ${tableId}`);
-        });
-
-        generatePayBtn.addEventListener('click', () => {
-            let tableId = qrInput.value.trim() || 'T12';
-            let amount = customAmount.value.trim() || '0.00';
-            let paymentLink = `https://pay.menuar.com/pay?table=${encodeURIComponent(tableId)}&amount=${encodeURIComponent(amount)}`;
-            generateQR(paymentLink, `PAY $${amount}`);
-        });
-
-        // optional: Enter key on input
-        qrInput.addEventListener('keyup', (e) => {
-            if (e.key === 'Enter') generateBtn.click();
-        });
-
-        // If user tries to access portal directly, show auth
-        if (!isLoggedIn) {
-            portal.classList.remove('show');
-            authContainer.style.display = 'block';
+    function doLogin(email, pwd) { return email.trim() !== '' && pwd.trim() !== ''; }
+    document.getElementById('loginBtn').addEventListener('click', () => {
+        const email = document.getElementById('loginEmail').value;
+        const pwd = document.getElementById('loginPassword').value;
+        if (doLogin(email, pwd)) {
+            authContainer.style.display = 'none';
+            portalDiv.classList.add('show');
+        } else {
+            loginErrorSpan.innerText = 'Enter any non-empty credentials';
         }
-    })();
+    });
+    document.getElementById('signupBtn').addEventListener('click', () => {
+        const name = document.getElementById('signupName').value;
+        const email = document.getElementById('signupEmail').value;
+        const pwd = document.getElementById('signupPassword').value;
+        const rest = document.getElementById('signupRestaurant').value;
+        if (name && email && pwd && rest) {
+            authContainer.style.display = 'none';
+            portalDiv.classList.add('show');
+        } else {
+            signupErrorSpan.innerText = 'Fill all fields';
+        }
+    });
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+        portalDiv.classList.remove('show');
+        authContainer.style.display = 'block';
+        showingLogin = true;
+        loginFormDiv.style.display = 'block';
+        signupFormDiv.style.display = 'none';
+    });
+
+    // ---------- CLICKABLE SIDEBAR NAVIGATION ----------
+    const panels = {
+        dashboard: document.getElementById('panel-dashboard'),
+        restaurants: document.getElementById('panel-restaurants'),
+        onboarding: document.getElementById('panel-onboarding'),
+        assets: document.getElementById('panel-assets'),
+        subscriptions: document.getElementById('panel-subscriptions'),
+        qr: document.getElementById('panel-qr'),
+        reports: document.getElementById('panel-reports'),
+        support: document.getElementById('panel-support')
+    };
+
+    const navItems = document.querySelectorAll('.nav-item');
+    function activatePanel(panelId) {
+        // deactivate all panels
+        Object.values(panels).forEach(panel => {
+            if (panel) panel.classList.remove('active-panel');
+        });
+        if (panels[panelId]) panels[panelId].classList.add('active-panel');
+        // update active class on nav items
+        navItems.forEach(item => {
+            const itemPanel = item.getAttribute('data-panel');
+            if (itemPanel === panelId) {
+                item.classList.add('active');
+            } else {
+                item.classList.remove('active');
+            }
+        });
+    }
+
+    navItems.forEach(item => {
+        item.addEventListener('click', () => {
+            const panelId = item.getAttribute('data-panel');
+            if (panelId && panels[panelId]) {
+                activatePanel(panelId);
+            }
+        });
+    });
+
+    // default active dashboard
+    activatePanel('dashboard');
+
+    // ---------- QR SYSTEM (dynamic inside QR panel) ----------
+    let qrCanvasDynamic = document.getElementById('qrCanvasDynamic');
+    const qrTableInput = document.getElementById('qrTableInput');
+    const genTableQr = document.getElementById('genTableQr');
+    const genPayQr = document.getElementById('genPayQr');
+    const qrAmountInput = document.getElementById('qrAmountInput');
+    const qrLabelDynamic = document.getElementById('qrLabelDynamic');
+    const qrLinkDynamic = document.getElementById('qrLinkDynamic');
+
+    function generateQRCode(text, label) {
+        if (!text) text = 'menuar.com/order';
+        QRCode.toCanvas(qrCanvasDynamic, text, { width: 150, margin: 1, color: { dark: '#0b1a33', light: '#ffffff' } }, (err) => {
+            if (err) console.warn(err);
+        });
+        qrLabelDynamic.innerText = label;
+        qrLinkDynamic.innerText = text;
+    }
+
+    genTableQr.addEventListener('click', () => {
+        let table = qrTableInput.value.trim() || 'T1';
+        let link = `https://menuar.com/menu?table=${encodeURIComponent(table)}`;
+        generateQRCode(link, `TABLE ${table} · SCAN TO ORDER`);
+    });
+    genPayQr.addEventListener('click', () => {
+        let table = qrTableInput.value.trim() || 'T1';
+        let amount = qrAmountInput.value.trim() || '0';
+        let link = `https://pay.menuar.com/checkout?table=${encodeURIComponent(table)}&amount=${encodeURIComponent(amount)}`;
+        generateQRCode(link, `PAY $${amount} · SCAN TO PAY`);
+    });
+    // initial default QR
+    generateQRCode('https://menuar.com/menu?table=T12', 'SCAN TO ORDER');
+
+    // handle Enter on fields
+    qrTableInput.addEventListener('keypress', (e) => { if(e.key === 'Enter') genTableQr.click(); });
+    qrAmountInput.addEventListener('keypress', (e) => { if(e.key === 'Enter') genPayQr.click(); });
 </script>
 </body>
 </html>
